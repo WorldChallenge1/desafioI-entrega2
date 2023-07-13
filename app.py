@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI, Response, status
 from fastapi_sqlalchemy import DBSessionMiddleware, db
+from fastapi.middleware.cors import CORSMiddleware
 from schemas.posts import Post as PostSchema
 from typing import List
 import os
@@ -10,7 +11,22 @@ load_dotenv(".env")
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:8000",
+    "http://localhost:9000",
+    "http://localhost",
+    "http://localhost:8080",
+    "http://0.0.0.0:8080",
+]
+
 app.add_middleware(DBSessionMiddleware, db_url=os.environ.get("DATABASE_URL"))
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
